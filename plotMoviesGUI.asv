@@ -193,14 +193,10 @@ function startTimeEdit_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of startTimeEdit as text
 %        str2double(get(hObject,'String')) returns contents of startTimeEdit as a double
 datastruct = guidata(gcbo);
-if isfield(datastruct, 'timeParams')
-    timeParams = datastruct.timeParams;
-    timeParams.startTimeDouble = str2double(get(hObject,'String'));
-else
-    timeParams.startTimeDouble = str2double(get(hObject,'String'));
-end
-
-datastruct.timeParams = timeParams;
+if isfield(datastr
+timeParams = datastruct.timeParams;
+startTimeDouble = str2double(get(hObject,'String'));
+datastruct.startTimeDouble = startTimeDouble;
 guidata(gcbo,datastruct) 
 
 % --- Executes during object creation, after setting all properties.
@@ -208,16 +204,7 @@ function startTimeEdit_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to startTimeEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-datastruct = guidata(gcbo);
-if isfield(datastruct, 'timeParams')
-    timeParams = datastruct.timeParams;
-    timeParams.startTimeDouble = str2double(get(hObject,'String'));
-else
-    timeParams.startTimeDouble = str2double(get(hObject,'String'));
-end
 
-datastruct.timeParams = timeParams;
-guidata(gcbo,datastruct) 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -240,16 +227,7 @@ function stopTimeEdit_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to stopTimeEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-datastruct = guidata(gcbo);
-if isfield(datastruct, 'timeParams')
-    timeParams = datastruct.timeParams;
-    timeParams.stopTimeDouble = str2double(get(hObject,'String'));
-else
-    timeParams.stopTimeDouble = str2double(get(hObject,'String'));
-end
 
-datastruct.timeParams = timeParams;
-guidata(gcbo,datastruct) 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -263,17 +241,6 @@ function monitorPixelWidthEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to monitorPixelWidthEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-datastruct = guidata(gcbo);
-
-if isfield(datastruct, 'presentParams')
-    presentParams = datastruct.presentParams;
-    presentParams.monitorWidthPixels = str2double(get(hObject,'String'));
-else
-    presentParams.monitorWidthPixels = str2double(get(hObject,'String'));
-end
-
-datastruct.presentParams = presentParams;
-guidata(gcbo,datastruct) 
 
 % Hints: get(hObject,'String') returns contents of monitorPixelWidthEdit as text
 %        str2double(get(hObject,'String')) returns contents of monitorPixelWidthEdit as a double
@@ -284,17 +251,7 @@ function monitorPixelWidthEdit_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to monitorPixelWidthEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-datastruct = guidata(gcbo);
 
-if isfield(datastruct, 'presentParams')
-    presentParams = datastruct.presentParams;
-    presentParams.monitorWidthPixels = str2double(get(hObject,'String'));
-else
-    presentParams.monitorWidthPixels = str2double(get(hObject,'String'));
-end
-
-datastruct.presentParams = presentParams;
-guidata(gcbo,datastruct) 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -307,17 +264,7 @@ function monitorPixelHeightEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to monitorPixelHeightEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-datastruct = guidata(gcbo);
 
-if isfield(datastruct, 'presentParams')
-    presentParams = datastruct.presentParams;
-    presentParams.monitorHeightPixels = str2double(get(hObject,'String'));
-else
-    presentParams.monitorHeightPixels = str2double(get(hObject,'String'));
-end
-
-datastruct.presentParams = presentParams;
-guidata(gcbo,datastruct) 
 % Hints: get(hObject,'String') returns contents of monitorPixelHeightEdit as text
 %        str2double(get(hObject,'String')) returns contents of monitorPixelHeightEdit as a double
 
@@ -327,17 +274,7 @@ function monitorPixelHeightEdit_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to monitorPixelHeightEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
-datastruct = guidata(gcbo);
 
-if isfield(datastruct, 'presentParams')
-    presentParams = datastruct.presentParams;
-    presentParams.monitorHeightPixels = str2double(get(hObject,'String'));
-else
-    presentParams.monitorHeightPixels = str2double(get(hObject,'String'));
-end
-
-datastruct.presentParams = presentParams;
-guidata(gcbo,datastruct) 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
