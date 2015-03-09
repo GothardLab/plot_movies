@@ -22,7 +22,7 @@ function varargout = plotMoviesGUI(varargin)
 
 % Edit the above text to modify the response to help plotMoviesGUI
 
-% Last Modified by GUIDE v2.5 09-Mar-2015 14:41:38
+% Last Modified by GUIDE v2.5 09-Mar-2015 15:18:33
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -178,7 +178,14 @@ function timeRangeCheckbox_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 datastruct = guidata(gcbo);
-timeParams.useTimeRangeBool = get(hObject,'Value');
+
+if isfield(datastruct, 'timeParams')
+    timeParams = datastruct.timeParams;
+    timeParams.useTimeRangeBool = get(hObject,'Value');
+else
+    timeParams.useTimeRangeBool = get(hObject,'Value');
+end
+
 datastruct.timeParams = timeParams;
 guidata(gcbo,datastruct) 
 % Hint: get(hObject,'Value') returns toggle state of timeRangeCheckbox
@@ -230,7 +237,16 @@ function stopTimeEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to stopTimeEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+datastruct = guidata(gcbo);
+if isfield(datastruct, 'timeParams')
+    timeParams = datastruct.timeParams;
+    timeParams.stopTimeDouble = str2double(get(hObject,'String'));
+else
+    timeParams.stopTimeDouble = str2double(get(hObject,'String'));
+end
 
+datastruct.timeParams = timeParams;
+guidata(gcbo,datastruct) 
 % Hints: get(hObject,'String') returns contents of stopTimeEdit as text
 %        str2double(get(hObject,'String')) returns contents of stopTimeEdit as a double
 
@@ -350,7 +366,17 @@ function monitorVoltageScaleEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to monitorVoltageScaleEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+datastruct = guidata(gcbo);
 
+if isfield(datastruct, 'presentParams')
+    presentParams = datastruct.presentParams;
+    presentParams.monitorVoltageScale = str2double(get(hObject,'String'));
+else
+    presentParams.monitorVoltageScale = str2double(get(hObject,'String'));
+end
+
+datastruct.presentParams = presentParams;
+guidata(gcbo,datastruct) 
 % Hints: get(hObject,'String') returns contents of monitorVoltageScaleEdit as text
 %        str2double(get(hObject,'String')) returns contents of monitorVoltageScaleEdit as a double
 
@@ -360,7 +386,17 @@ function monitorVoltageScaleEdit_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to monitorVoltageScaleEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+datastruct = guidata(gcbo);
 
+if isfield(datastruct, 'presentParams')
+    presentParams = datastruct.presentParams;
+    presentParams.monitorVoltageScale = str2double(get(hObject,'String'));
+else
+    presentParams.monitorVoltageScale = str2double(get(hObject,'String'));
+end
+
+datastruct.presentParams = presentParams;
+guidata(gcbo,datastruct) 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -373,7 +409,17 @@ function pres2angEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to pres2angEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+datastruct = guidata(gcbo);
 
+if isfield(datastruct, 'presentParams')
+    presentParams = datastruct.presentParams;
+    presentParams.pres2ang = str2double(get(hObject,'String'));
+else
+    presentParams.pres2ang = str2double(get(hObject,'String'));
+end
+
+datastruct.presentParams = presentParams;
+guidata(gcbo,datastruct) 
 % Hints: get(hObject,'String') returns contents of pres2angEdit as text
 %        str2double(get(hObject,'String')) returns contents of pres2angEdit as a double
 
@@ -383,7 +429,17 @@ function pres2angEdit_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to pres2angEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+datastruct = guidata(gcbo);
 
+if isfield(datastruct, 'presentParams')
+    presentParams = datastruct.presentParams;
+    presentParams.pres2ang = str2double(get(hObject,'String'));
+else
+    presentParams.pres2ang = str2double(get(hObject,'String'));
+end
+
+datastruct.presentParams = presentParams;
+guidata(gcbo,datastruct) 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -396,7 +452,19 @@ function colorMenu_Callback(hObject, eventdata, handles)
 % hObject    handle to colorMenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+datastruct = guidata(gcbo);
 
+contents = cellstr(get(hObject,'String'));
+
+if isfield(datastruct, 'plotParams')
+    plotParams = datastruct.presentParams;
+    plotParams.plotColor =  contents{get(hObject,'Value')};
+else
+    plotParams.plotColor =  contents{get(hObject,'Value')};
+end
+
+datastruct.plotParams = plotParams;
+guidata(gcbo,datastruct) 
 % Hints: contents = cellstr(get(hObject,'String')) returns colorMenu contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from colorMenu
 
@@ -406,7 +474,19 @@ function colorMenu_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to colorMenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+datastruct = guidata(gcbo);
 
+contents = cellstr(get(hObject,'String'));
+
+if isfield(datastruct, 'plotParams')
+    plotParams = datastruct.presentParams;
+    plotParams.plotColor =  contents{get(hObject,'Value')};
+else
+    plotParams.plotColor =  contents{get(hObject,'Value')};
+end
+
+datastruct.plotParams = plotParams;
+guidata(gcbo,datastruct) 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -550,3 +630,48 @@ function plotButton_Callback(hObject, eventdata, handles)
 % hObject    handle to plotButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in debugButton.
+function debugButton_Callback(hObject, eventdata, handles)
+% hObject    handle to debugButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+%Debug data dump of GCBO
+datastruct = guidata(gcbo);
+
+names = fieldnames(datastruct);
+
+for n = 1:size(names,1)
+    clear subfield
+    subfield_n = names{n};
+    fprintf('Name: %s\t', subfield_n);
+    subfield = datastruct.(subfield_n);
+    if isstruct(subfield)
+          fprintf('--> stucture');
+          subnames = fieldnames(subfield);
+          for s = 1:size(subnames,1) 
+              fprintf('\n');
+              sub_subfield_n = subnames{s};
+              sub_subfield = subfield.(sub_subfield_n);
+              if isstruct(sub_subfield)
+                  fprintf('\t\t %s\t--> stucture', sub_subfield_n);
+              elseif isa(sub_subfield, 'double')
+                  fprintf('\t\t %s\t--> (%d) double', sub_subfield_n, sub_subfield);
+              elseif isa(sub_subfield, 'string')   
+                  fprintf('\t\t %s\t--> (%s) string', sub_subfield_n, sub_subfield);
+                elseif isa(sub_subfield, 'char')   
+                  fprintf('\t\t %s\t--> (%s) char', sub_subfield_n, sub_subfield);
+              else
+                  fprintf('\t\t %s\t--> %s', sub_subfield_n, class(sub_subfield));
+              end
+          end   
+    elseif isa(subfield, 'double')      
+        fprintf('--> double');
+        
+    else
+         fprintf('--> %s', class(subfield));
+    end
+    fprintf('\n');
+end
