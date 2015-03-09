@@ -499,7 +499,17 @@ function outputDirEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to outputDirEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+datastruct = guidata(gcbo);
 
+if isfield(datastruct, 'outParams')
+    outParams = datastruct.outParams;
+    outParams.outDir =  get(hObject,'String');
+else
+    outParams.outDir =  get(hObject,'String');
+end
+
+datastruct.outParams = outParams;
+guidata(gcbo,datastruct) 
 % Hints: get(hObject,'String') returns contents of outputDirEdit as text
 %        str2double(get(hObject,'String')) returns contents of outputDirEdit as a double
 
@@ -522,7 +532,22 @@ function outputDirButton_Callback(hObject, eventdata, handles)
 % hObject    handle to outputDirButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
 folder_name = uigetdir(matlabroot,'Select the folder where you want to save the movies...');
+folder_name(end+1) = '\';
+
+datastruct = guidata(gcbo);
+if isfield(datastruct, 'outParams')
+    outParams = datastruct.outParams;
+    outParams.outDir =  folder_name;
+else
+    outParams.outDir =  folder_name;
+end
+
+set(handles.outputDirEdit,'String',folder_name)
+
+datastruct.outParams = outParams;
+guidata(gcbo,datastruct) 
 
 
 function timeScaleEdit_Callback(hObject, eventdata, handles)
