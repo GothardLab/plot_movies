@@ -1,3 +1,9 @@
+%       plotMoviesGUI
+%           Written by Philip Putnam, University of Arizona
+%   
+%       This GUI is meant as front end device to help plot X/Y pupil
+%       data on videos shown using presentation software
+
 function varargout = plotMoviesGUI(varargin)
 % PLOTMOVIESGUI MATLAB code for plotMoviesGUI.fig
 %      PLOTMOVIESGUI, by itself, creates a new PLOTMOVIESGUI or raises the existing
@@ -497,7 +503,7 @@ datastruct = guidata(gcbo);
 contents = cellstr(get(hObject,'String'));
 
 if isfield(datastruct, 'plotParams')
-    plotParams = datastruct.presentParams;
+    plotParams = datastruct.plotParams;
     plotParams.plotColor =  contents{get(hObject,'Value')};
 else
     plotParams.plotColor =  contents{get(hObject,'Value')};
@@ -519,7 +525,7 @@ datastruct = guidata(gcbo);
 contents = cellstr(get(hObject,'String'));
 
 if isfield(datastruct, 'plotParams')
-    plotParams = datastruct.presentParams;
+    plotParams = datastruct.plotParams;
     plotParams.plotColor =  contents{get(hObject,'Value')};
 else
     plotParams.plotColor =  contents{get(hObject,'Value')};
@@ -539,17 +545,24 @@ function outputDirEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to outputDirEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-datastruct = guidata(gcbo);
+input = get(hObject,'String');
 
-if isfield(datastruct, 'outParams')
-    outParams = datastruct.outParams;
-    outParams.outDir =  get(hObject,'String');
+if isdir(input)
+
+    datastruct = guidata(gcbo);
+
+    if isfield(datastruct, 'outParams')
+        outParams = datastruct.outParams;
+        outParams.outDir =  input;
+    else
+        outParams.outDir =  input;
+    end
+
+    datastruct.outParams = outParams;
+    guidata(gcbo,datastruct)
 else
-    outParams.outDir =  get(hObject,'String');
+     warndlg('Invalid output folder selected!','Output folder error!');
 end
-
-datastruct.outParams = outParams;
-guidata(gcbo,datastruct) 
 % Hints: get(hObject,'String') returns contents of outputDirEdit as text
 %        str2double(get(hObject,'String')) returns contents of outputDirEdit as a double
 
@@ -772,7 +785,7 @@ datastruct = guidata(gcbo);
 contents = cellstr(get(hObject,'String'));
 
 if isfield(datastruct, 'plotParams')
-    plotParams = datastruct.presentParams;
+    plotParams = datastruct.plotParams;
     plotParams.cypherNames = get(hObject,'Value');
 else
     plotParams.cypherNames = get(hObject,'Value');
@@ -836,14 +849,56 @@ function plotButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 datastruct = guidata(gcbo);
-validInputs(datastruct)
+
+if validInputs(datastruct)
+    plotDat.plotParams = datastruct.plotParams;
+    plotDat.presentParams = datastruct.presentParams;
+    plotDat.timeParams = datastruct.timeParams;
+    plotDat.smrParams = datastruct.smrParams;
+    plotDat.itemParams = datastruct.itemParams;
+    plotDat.outParams = datastruct.outParams;
+    
+    save('plotDat.mat', 'plotDat');
+else
+    
+end
+
 
 % --- Used to validate all inputs
-function [pass] = validInputs(datastruct)
+function [pass] = validInputs(inputstruct)
 
 pass = 1; %Set default value to true, then evaluate each set of params
 
-if isfield
+if ~isfield(inputstruct, 'smrParams')
+        warndlg('No spike file selected!','Spike file error!');
+        pass = 0;
+        return;
+end
+    
+if ~isfield(inputstruct, 'itemParams')
+        warndlg('No item file selected!','Item file error!');
+        pass = 0;
+        return;
+end
+
+if ~isfield(inputstruct, 'outParams')
+        warndlg('No item output folder selected!','Output folder error!');
+        pass = 0;
+        return;
+end
+
+if inputstruct.timeParams.useTimeRangeBool
+    
+    if inputstruct.timeParams.startTimeDouble < 0 || inputstruct.timeParams.startTimeDouble > inputstruct.timeParams.stopTimeDouble
+        warndlg('Time limits out of range!','Time limits error');
+        pass = 0;
+        return;
+    end
+    
+end
+
+
+    
 
 
 

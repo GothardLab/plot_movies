@@ -1,3 +1,12 @@
+%       plotMoviesGUI
+%           Written by Philip Putnam, University of Arizona, 2015
+%   
+%       This GUI is meant as front end device to help plot X/Y pupil
+%       data on videos shown using presentation software and the
+%       scenario file "show_movies.sce" or similar
+%
+%       Code adopted from Clayton Mosher and others in the Gothard lab.       
+
 function varargout = plotMoviesGUI(varargin)
 % PLOTMOVIESGUI MATLAB code for plotMoviesGUI.fig
 %      PLOTMOVIESGUI, by itself, creates a new PLOTMOVIESGUI or raises the existing
