@@ -1,3 +1,6 @@
+%       plotMoviesFunc.m
+%           Written by Philip Putnam, University of Arizona, 2015
+
 %function [ output_args ] = plotMoviesFunc( plotDat )
 %PLOTMOVIESFUNC Plots movie scanpath input from GUI or wrapper function
 %   Inputs

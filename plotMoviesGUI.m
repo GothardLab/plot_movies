@@ -1,4 +1,4 @@
-%       plotMoviesGUI
+%       plotMoviesGUI.m
 %           Written by Philip Putnam, University of Arizona, 2015
 %   
 %       This GUI is meant as front end device to help plot X/Y pupil
