@@ -663,7 +663,7 @@ else
     sourceParams.sourceDir =  folder_name;
 end
 
-set(handles.outputDirEdit,'String',folder_name)
+set(handles.sourceMovieEdit,'String',folder_name)
 
 datastruct.sourceParams = sourceParams;
 guidata(gcbo,datastruct) 
@@ -700,6 +700,10 @@ if isfield(datastruct, 'plotParams')
 else
     plotParams.timeScale =  str2double(get(hObject,'String'));
 end
+
+%This is cheeky again but no CreateFcn for checkboxes
+%so we do it here
+plotParams.cypherNames = 0;
 
 datastruct.plotParams = plotParams;
 guidata(gcbo,datastruct) 
@@ -921,7 +925,8 @@ if validInputs(datastruct)
     plotDat.timeParams = datastruct.timeParams;
     plotDat.smrParams = datastruct.smrParams;
     plotDat.itemParams = datastruct.itemParams;
-    plotDat.outParams = datastruct.outParams;
+    plotDat.spike = datastruct.outParams;
+    plotDat.sourceParams = datastruct.sourceParams;
     
     save('plotDat.mat', 'plotDat');
 else
