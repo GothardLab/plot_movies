@@ -554,7 +554,17 @@ function timeScaleEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to timeScaleEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+datastruct = guidata(gcbo);
 
+if isfield(datastruct, 'plotParams')
+    plotParams = datastruct.presentParams;
+    plotParams.timeScale =  str2double(get(hObject,'String'));
+else
+    plotParams.timeScale =  str2double(get(hObject,'String'));
+end
+
+datastruct.plotParams = plotParams;
+guidata(gcbo,datastruct) 
 % Hints: get(hObject,'String') returns contents of timeScaleEdit as text
 %        str2double(get(hObject,'String')) returns contents of timeScaleEdit as a double
 
@@ -564,7 +574,17 @@ function timeScaleEdit_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to timeScaleEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+datastruct = guidata(gcbo);
 
+if isfield(datastruct, 'plotParams')
+    plotParams = datastruct.presentParams;
+    plotParams.timeScale =  str2double(get(hObject,'String'));
+else
+    plotParams.timeScale =  str2double(get(hObject,'String'));
+end
+
+datastruct.plotParams = plotParams;
+guidata(gcbo,datastruct) 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
