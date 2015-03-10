@@ -497,7 +497,7 @@ datastruct = guidata(gcbo);
 contents = cellstr(get(hObject,'String'));
 
 if isfield(datastruct, 'plotParams')
-    plotParams = datastruct.plotParams;
+    plotParams = datastruct.presentParams;
     plotParams.plotColor =  contents{get(hObject,'Value')};
 else
     plotParams.plotColor =  contents{get(hObject,'Value')};
@@ -519,7 +519,7 @@ datastruct = guidata(gcbo);
 contents = cellstr(get(hObject,'String'));
 
 if isfield(datastruct, 'plotParams')
-    plotParams = datastruct.plotParams;
+    plotParams = datastruct.presentParams;
     plotParams.plotColor =  contents{get(hObject,'Value')};
 else
     plotParams.plotColor =  contents{get(hObject,'Value')};
@@ -539,24 +539,17 @@ function outputDirEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to outputDirEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-input = get(hObject,'String');
+datastruct = guidata(gcbo);
 
-if isdir(input)
-
-    datastruct = guidata(gcbo);
-
-    if isfield(datastruct, 'outParams')
-        outParams = datastruct.outParams;
-        outParams.outDir =  input;
-    else
-        outParams.outDir =  input;
-    end
-
-    datastruct.outParams = outParams;
-    guidata(gcbo,datastruct)
+if isfield(datastruct, 'outParams')
+    outParams = datastruct.outParams;
+    outParams.outDir =  get(hObject,'String');
 else
-     warndlg('Invalid output folder selected!','Output folder error!');
+    outParams.outDir =  get(hObject,'String');
 end
+
+datastruct.outParams = outParams;
+guidata(gcbo,datastruct) 
 % Hints: get(hObject,'String') returns contents of outputDirEdit as text
 %        str2double(get(hObject,'String')) returns contents of outputDirEdit as a double
 
@@ -779,7 +772,7 @@ datastruct = guidata(gcbo);
 contents = cellstr(get(hObject,'String'));
 
 if isfield(datastruct, 'plotParams')
-    plotParams = datastruct.plotParams;
+    plotParams = datastruct.presentParams;
     plotParams.cypherNames = get(hObject,'Value');
 else
     plotParams.cypherNames = get(hObject,'Value');
@@ -843,56 +836,14 @@ function plotButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 datastruct = guidata(gcbo);
-
-if validInputs(datastruct)
-    plotDat.plotParams = datastruct.plotParams;
-    plotDat.presentParams = datastruct.presentParams;
-    plotDat.timeParams = datastruct.timeParams;
-    plotDat.smrParams = datastruct.smrParams;
-    plotDat.itemParams = datastruct.itemParams;
-    plotDat.outParams = datastruct.outParams;
-    
-    save('plotDat.mat', 'plotDat');
-else
-    
-end
-
+validInputs(datastruct)
 
 % --- Used to validate all inputs
-function [pass] = validInputs(inputstruct)
+function [pass] = validInputs(datastruct)
 
 pass = 1; %Set default value to true, then evaluate each set of params
 
-if ~isfield(inputstruct, 'smrParams')
-        warndlg('No spike file selected!','Spike file error!');
-        pass = 0;
-        return;
-end
-    
-if ~isfield(inputstruct, 'itemParams')
-        warndlg('No item file selected!','Item file error!');
-        pass = 0;
-        return;
-end
-
-if ~isfield(inputstruct, 'outParams')
-        warndlg('No item output folder selected!','Output folder error!');
-        pass = 0;
-        return;
-end
-
-if inputstruct.timeParams.useTimeRangeBool
-    
-    if inputstruct.timeParams.startTimeDouble < 0 || inputstruct.timeParams.startTimeDouble > inputstruct.timeParams.stopTimeDouble
-        warndlg('Time limits out of range!','Time limits error');
-        pass = 0;
-        return;
-    end
-    
-end
-
-
-    
+if isfield
 
 
 
