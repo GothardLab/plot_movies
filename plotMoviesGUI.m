@@ -31,7 +31,7 @@ function varargout = plotMoviesGUI(varargin)
 
 % Edit the above text to modify the response to help plotMoviesGUI
 
-% Last Modified by GUIDE v2.5 09-Mar-2015 15:18:33
+% Last Modified by GUIDE v2.5 09-Mar-2015 19:25:29
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -217,6 +217,9 @@ if exist(itemFullPath, 'file')
 else
     warndlg('Selected File does not exist!','Item file error!');
 end
+
+
+
 
 % --- Executes on button press in timeRangeCheckbox.
 function timeRangeCheckbox_Callback(hObject, eventdata, handles)
@@ -605,6 +608,65 @@ set(handles.outputDirEdit,'String',folder_name)
 datastruct.outParams = outParams;
 guidata(gcbo,datastruct) 
 
+function sourceMovieEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to sourceMovieEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+input = get(hObject,'String');
+
+if isdir(input)
+
+    datastruct = guidata(gcbo);
+
+    if isfield(datastruct, 'sourceParams')
+        sourceParams = datastruct.sourceParams;
+        sourceParams.sourceDir =  input;
+    else
+        sourceParams.sourceDir =  input;
+    end
+
+    datastruct.sourceParams = sourceParams;
+    guidata(gcbo,datastruct)
+else
+     warndlg('Invalid source movie folder selected!','Movie folder error!');
+end
+% Hints: get(hObject,'String') returns contents of sourceMovieEdit as text
+%        str2double(get(hObject,'String')) returns contents of sourceMovieEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function sourceMovieEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to sourceMovieEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in sourceMovieButton.
+function sourceMovieButton_Callback(hObject, eventdata, handles)
+% hObject    handle to sourceMovieButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+folder_name = uigetdir(matlabroot,'Select the folder where the orginal movies are located...');
+%folder_name(end+1) = '\'; %Bad programming practice
+
+datastruct = guidata(gcbo);
+if isfield(datastruct, 'sourceParams')
+    sourceParams = datastruct.sourceParams;
+    sourceParams.sourceDir =  folder_name;
+else
+    sourceParams.sourceDir =  folder_name;
+end
+
+set(handles.outputDirEdit,'String',folder_name)
+
+datastruct.sourceParams = sourceParams;
+guidata(gcbo,datastruct) 
 
 function timeScaleEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to timeScaleEdit (see GCBO)
@@ -890,6 +952,13 @@ if ~isfield(inputstruct, 'outParams')
         return;
 end
 
+if ~isfield(inputstruct, 'sourceParams')
+        warndlg('No source movie folder selected!','Movie folder error!');
+        pass = 0;
+        return;
+end
+
+
 if inputstruct.timeParams.useTimeRangeBool
     
     if inputstruct.timeParams.startTimeDouble < 0 || inputstruct.timeParams.startTimeDouble > inputstruct.timeParams.stopTimeDouble
@@ -902,6 +971,10 @@ end
 
 
     
+
+
+
+
 
 
 
