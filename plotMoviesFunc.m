@@ -1,5 +1,5 @@
-%function [ output_args ] = plotMoviesFunc( input_args )
-%PLOTMOVIESFUNC Plots movie scanpath with programmatic inputs 
+%function [ output_args ] = plotMoviesFunc( plotDat )
+%PLOTMOVIESFUNC Plots movie scanpath input from GUI or wrapper function
 %   Inputs
 %       'spike', (string): Path to spike file
 %       'item', (string): Path to item file
