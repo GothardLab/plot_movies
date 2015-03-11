@@ -1,7 +1,7 @@
-function [trial_eyes] = calibrateXY (trial, xEyes, yEyes, presentParams)
+function [trial_eyes] = calibrateEyes (trial, xEyes, yEyes, presentParams)
  %keep trial xEyes yEyes presentParams
- 
- 
+
+
 monitorPixelWidth = presentParams.monitorWidthPixels; %the width of the monitor used during calibration (800x600 typically);
 monitorPixelHeight = presentParams.monitorHeightPixels; %the height of the monitor used during calibration (800x600 typically);
 monitorVoltageScale = presentParams.monitorVoltageScale; %the number of volts (out of 5) to distribute across the monitor (determned in presentation timing file);
@@ -34,14 +34,14 @@ expectedFrameTime_s = (1/frameRatePerSecond);
 expectedFrameTime_ms = round(expectedFrameTime_s*1000);
 
 for t = 1:ntrials
- 
-    
+
+
     for f = 1:trial(t).numberFrames-1
-        
- 
+
+
         frameStart_ms = round(trial_eyes(t).frameTimes(f) * 1000);
         frameEnd_ms = round(trial_eyes(t).frameTimes(f+1) * 1000);
-        
+
         trial_eyes(t).frame(f).frameStart_ms = frameStart_ms;
         trial_eyes(t).frame(f).frameEnd_ms = frameEnd_ms;
         trial_eyes(t).frame(f).rawX = rawX(frameStart_ms:frameEnd_ms);
@@ -50,7 +50,7 @@ for t = 1:ntrials
         trial_eyes(t).frame(f).calY = calY(frameStart_ms:frameEnd_ms);
 
     end
-    
+
     f = trial(t).numberFrames; % For the last frame
     frameStart_ms = round(trial_eyes(t).frameTimes(f) * 1000);
     frameEnd_ms = frameStart_ms + expectedFrameTime_ms;
@@ -61,7 +61,7 @@ for t = 1:ntrials
     trial_eyes(t).frame(f).rawY = rawY(frameStart_ms:frameEnd_ms);
     trial_eyes(t).frame(f).calX = calX(frameStart_ms:frameEnd_ms);
     trial_eyes(t).frame(f).calY = calY(frameStart_ms:frameEnd_ms);
- 
+
 end
 
 
@@ -99,14 +99,14 @@ end
 %         movietrial(i).eyex{j}=eyeX(frame1:frame2);  %cut teh eye data from one frame to the next and record it in the movietrial structure
 %         movietrial(i).eyey{j}=eyeY(frame1:frame2);  %cut teh eye data from one frame to the next and record it in the movietrial structure
 %     end
-%     
+%
 %     endframe=round(movietrial(i).frametime(length(movietrial(i).frametime))*1000);  %the last frame will be equal to the length of the frames shown for this movie
-%     
+%
 %     bc=sort([movietrial(i).frametime(1):-(1/30):movietrial(i).frametime(1)-1]);
 %     ad=sort([endframe/1000+0.033:(1/30):endframe/1000+0.033+1]);
 %     movietrial(i).preframetime=bc;
 %     movietrial(i).postframetime=ad;
-%     
+%
 %     for j=1:length(movietrial(i).preframetime)-1;  %for each movie frame (except the last)...
 %         clear frame1 frame2;   %clear these temporary variables so we don't get confused
 %         frame1=round(movietrial(i).preframetime(j)*1000);  %get the time that one frame was shown
@@ -117,7 +117,7 @@ end
 %     endpreframe=round(movietrial(i).preframetime(length(movietrial(i).preframetime))*1000);  %the last frame will be equal to the length of the frames shown for this movie
 %     movietrial(i).preeyex{length(movietrial(i).preframetime)}=eyeX(endpreframe:endpreframe+33); %since the movie is shown at 30 Hz, the last frame turned off 33ms later, record the eye data durign this time period
 %     movietrial(i).preeyey{length(movietrial(i).preframetime)}=eyeY(endpreframe:endpreframe+33); %since the movie is shown at 30 Hz, the last frame turned off 33ms later, record the eye data durign this time period
-%     
+%
 %     for j=1:length(movietrial(i).postframetime)-1;  %for each movie frame (except the last)...
 %         clear frame1 frame2;   %clear these temporary variables so we don't get confused
 %         frame1=round(movietrial(i).postframetime(j)*1000);  %get the time that one frame was shown
@@ -128,15 +128,14 @@ end
 %     endpostframe=round(movietrial(i).postframetime(length(movietrial(i).postframetime))*1000);  %the last frame will be equal to the length of the frames shown for this movie
 %     movietrial(i).posteyex{length(movietrial(i).postframetime)}=eyeX(endpostframe:endpostframe+33); %since the movie is shown at 30 Hz, the last frame turned off 33ms later, record the eye data durign this time period
 %     movietrial(i).posteyey{length(movietrial(i).postframetime)}=eyeY(endpostframe:endpostframe+33); %since the movie is shown at 30 Hz, the last frame turned off 33ms later, record the eye data durign this time period
-%     
+%
 %     movietrial(i).eyex{length(movietrial(i).frametime)}=eyeX(endframe:endframe+33); %since the movie is shown at 30 Hz, the last frame turned off 33ms later, record the eye data durign this time period
 %     movietrial(i).eyey{length(movietrial(i).frametime)}=eyeY(endframe:endframe+33); %since the movie is shown at 30 Hz, the last frame turned off 33ms later, record the eye data durign this time period
 %     movietrial(i).movieregions=20*ones(length(movietrial(i).frametime),1); %make a vector that will record the movie region that the monkey is looking at during each frame
 % end
-% 
+%
 % movienum=1; %set the initial movie number to 1
 % frame_num=1;    %set the initial frame number to 1
 % if ~isdir([eyePath,'matfiles\']);
 %     mkdir([eyePath,'matfiles\']);
 % end
-
