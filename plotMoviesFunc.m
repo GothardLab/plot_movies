@@ -125,8 +125,7 @@ for t = 1:ntrials
         stimFrames(f).img = frameLoad;
 
         clear frameLoad frameImageName
-
-
+        
       end
 
     end
@@ -146,17 +145,23 @@ for t = 1:ntrials
       %Clear the image
       cla;
 
+      %Put plot hold on
+      hold on;
+
       %Display the background
       imagesc([-(size(blackround,2)/2)*xPixelAngleFactor,(size(blackround,2)/2)*xPixelAngleFactor],[-(size(blackround,1)/2)*yPixelAngleFactor,(size(blackround,1)/2)*yPixelAngleFactor],blackround);
-      hold on;    %hold the background on while we also show the image (otherwise the black baground will just dissappear)
 
       %Get this frame to plot
       frameLoad = stimFrames(f).img;
 
       %Plot the stimulus frame
       imagesc([-(size(frameLoad,2)/2)*xPixelAngleFactor (size(frameLoad,2)/2)*xPixelAngleFactor],[-(size(frameLoad,1)/2)*yPixelAngleFactor (size(frameLoad,1)/2)*yPixelAngleFactor],frameLoad);
-      hold on;    %hold on the background and image while we plot the eye data
 
+      %Plot the scanpath
+      plot(trial(t).frame(frameIndex).calX,-trial(t).frame(frameIndex).calY,'Color',fixColor,'LineWidth',5);
+
+      %Get the frame to save
+      frame = getframe;
 
 
     end
