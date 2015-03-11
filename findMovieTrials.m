@@ -9,7 +9,7 @@
 %
 %       Code adopted from Clayton Mosher and others in the Gothard lab.  
 
-%function [ output_args ] = findMovieTrials(spikePath, itemPath)
+function [ trial ] = findMovieTrials(spikePath)
 %FINDMOVIETRIALS Finds movie trials from show_movies.sce or similar
 %   Inputs:
 %       'spikePath', (string): Path to spike file
@@ -19,10 +19,6 @@
 %
 
 % Load spike file
-clear all
-clc
-spikePath = 'D:\dat\smr\ImageMovieTest2.smr';
-
 try 
     [ codes, ts ] = getEncodes( spikePath );
 
@@ -31,21 +27,12 @@ catch err
     return
 end
 
-% Load item file
-% try 
-%   items = loadItemFile(itemPath);
-% 
-% catch err
-%     warndlg(['Error loading item file ->', err.identifier],'Item file')
-%     return
-% end
-
 nevents = size(codes,2);
 
 frameRatePerSecond = 30;
 expectedFrameTime_s = 1/frameRatePerSecond;
 
-method = 'placeholder';
+method = 'cue';
 
 switch method
     
@@ -73,7 +60,7 @@ switch method
         
     case 'frames' % Not functional yet    
         
-    case 'placeholder'
+    case 'cue'
        
         potentials = 0;
         
@@ -83,15 +70,20 @@ switch method
         
         for c = 1:nevents % Loop through events
 
-           if codes(c) == 35 % If 'placeholder on', a potential trial start
+           if codes(c) == 35 % If 'cue on', a potential trial start
                
                if c < nevents
                
-                   if codes(c+1) == 36% If folloed by 'placeholder off'
+                   if codes(c+1) == 36% If folloed by 'cue off'
                        
                        cue_on_s = ts(c);
                        cue_off_s = ts(c+1);
                        condition = codes(c+3)-(256*255);
+                       
+                       if condition < 1 || condition > 100 %If condition is out of range, try the 2nd code
+                           condition = codes(c+2)-(256*255);
+                       end
+                       
                        fprintf('Potential trial @ %06.4fs\t-->\tCondition:%d', cue_on_s, condition);
                        
 
@@ -158,11 +150,11 @@ switch method
                                    f = f+1;
                                    i = i+1;
                                else
-                                   fprintf('\n\t\t\tEnd\n');
+                                   fprintf('\n\t\t\tEnd');
                                 break;
                                end
                            else
-                               fprintf('\n\t\t\tEnd\n');
+                               fprintf('\n\t\t\tEnd');
                                break;
                                 
                            end
@@ -172,7 +164,7 @@ switch method
                        nframes = f-1;
                        frames_stop_s = ts(i-1);
                        
-                       fprintf('\nTrial end @ %06.4fs\t %d frames found', frames_stop_s, nframes);
+                       fprintf('\nTrial end @ %06.4fs\t %d frames found\n\n', frames_stop_s, nframes);
    
                      fprintf('\n');
                      
@@ -203,7 +195,23 @@ end
     
         
 
-
+% if exist('itemPath', 'var')
+%     
+%     %Load item file
+%     try 
+%       items = loadItemFile(itemPath);
+%       
+%       
+%       for t = 1 : size(trial,2)
+%           
+%       end
+% 
+%     catch err
+%         warndlg(['Error loading item file ->', err.identifier],'Item file')
+%         return
+%     end
+% 
+% end
 
 
 
