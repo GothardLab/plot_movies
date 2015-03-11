@@ -22,6 +22,8 @@ sourceDir = plotDat.sourceParams.sourceDir;
 outDir = plotDat.outParams.outDir;
 spikePath = plotDat.smrParams.path;
 itemPath = plotDat.itemParams.path;
+presentParams = plotDat.presentParams;
+
 
 % Load spike file
 try 
@@ -41,6 +43,7 @@ catch err
     return
 end
 
+% Find the eye channels
 for c = 1:size(spike,2)
     if strcmp(spike(c).title, 'eyex')
         xChan = c;
@@ -50,16 +53,21 @@ for c = 1:size(spike,2)
      end
 end
 
+% Make sure we could find the eyes
 if ~exist(xChan, 'var') ||  ~exist(yChan, 'var')
      warndlg('Cannot find X and/or Y eye channels in file');
      return
-end
+end 
 
+% Find the movie trials
+[ trial ] = findMovieTrials(spikePath);
 
+% Seperate the eye channels
+xEyes = spike(xChan);
+yEyes = spike(yChan);
 
-
-[movie] = findMovieTrials(spikePath, itemFilePath);
-[movie] = calibrateXY (movie, spike, xChan, yChan);
+% Calibrate the eye data during the trials
+[ trial_eyes ] = calibrateXY (trial, xEyes, yEyes, presentParams);
 
 
 
