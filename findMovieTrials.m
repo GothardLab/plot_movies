@@ -21,12 +21,13 @@
 % Load spike file
 clear all
 clc
-spikePath = 'D:\dat\smr\ImageMovieTest.smr'
+spikePath = 'D:\dat\smr\ImageMovieTest2.smr';
+
 try 
-    spike = load_smr(spikePath);
+    [ codes, ts ] = getEncodes( spikePath );
 
 catch err
-    warndlg(['Error loading spike file ->', err.identifier],'Spike error')
+    warndlg(['Error loading encodes ->', err.identifier],'Spike error')
     return
 end
 
@@ -39,59 +40,170 @@ end
 %     return
 % end
 
-% Find condition channel
-for c = 1:size(spike,2)
-    if strcmp(spike(c).title, 'conditio') || strcmp(spike(c).title, 'DigMark') 
-        condChan = c;
-    end
-end
+nevents = size(codes,2);
 
-if ~exist('condChan', 'var')
-   warndlg('No condition channel found, please title it either "conditio" or "DigMark".', 'Spike error');
-   return;
-end
+frameRatePerSecond = 30;
+expectedFrameTime_s = 1/frameRatePerSecond;
 
-% Save condition channel
-conditionChan = spike(condChan);
+method = 'placeholder';
 
-%Extract times and events
-times = conditionChan.data.timings;
-events = conditionChan.data.markers(:,1);
-
-
-%Clear possible blank first event
-if events(1)==0;
-    events(1)=[];
-    times(1)=[];
-end
-
-timeDiffs = diff(times);
-
-c = 0;
-if ~mod(size(events,1),2) %If there are an even amount of events for pairing
+switch method
     
-    for i = 1:(size(events,1)-1)
-        if (timeDiffs(i)>0.002 && timeDiffs(i)<0.006)
-            c=c+1;
-            lob(c)=events(i);
-            hib(c)=events(i+1);
-            ts(c)=times(i);
+    case 'cumsumdiff' % Not functional yet
+        
+        diffCodes = [0 cumsum(diff(codes)~=1)];
+        
+        uniqueDiffCodes = unique(diffCodes);
+        
+        numUniqueDiffCodes = size(uniqueDiffCodes,2);
+        
+        for u = 1:numUniqueDiffCodes
+            
+            theseLocs = find(diffCodes == uniqueDiffCodes(u));
+            
+            thisSeqFirst = codes(theseLocs(1));
+            thisSeqLast = codes(theseLocs(end));
+            thisDiffCode = diffCodes(theseLocs(1));
+            numTheseLocs = size(theseLocs,2);
+            fprintf('Codes: %6d -> %6d\t\tElements: %6d -> %6d\tDiff: %d\tInstances: %d\t\n',thisSeqFirst, thisSeqLast,theseLocs(1), theseLocs(end), thisDiffCode, numTheseLocs);
         end
-    end
+
+        
+        %codes(diffCodes==mode(diffCodes))
+        
+    case 'frames' % Not functional yet    
+        
+    case 'placeholder'
+       
+        potentials = 0;
+        
+        maxframes = 300;
+        
+        t = 0;
+        
+        for c = 1:nevents % Loop through events
+
+           if codes(c) == 35 % If 'placeholder on', a potential trial start
+               
+               if c < nevents
+               
+                   if codes(c+1) == 36% If folloed by 'placeholder off'
+                       
+                       cue_on_s = ts(c);
+                       cue_off_s = ts(c+1);
+                       condition = codes(c+3)-(256*255);
+                       fprintf('Potential trial @ %06.4fs\t-->\tCondition:%d', cue_on_s, condition);
+                       
+
+                       expectedFirstFrame = 1001;
+                       
+                       
+                       l = c; % Create a seperate index to look for the first frame
+                       
+                       while l <= nevents && l < c+6 % Look up to five frames ahead
+                           
+                           
+                           
+                           if codes(l) == expectedFirstFrame % If we find our expected start frame
+                               
+                                fprintf('\tFrames @ %06.4fs', ts(l));
+                                
+                                frames_start_index = l;
+                                first_frame = 1;
+                                
+                                frames_start_s = ts(l);
+                                
+                               
+                                break;
+                                
+                           elseif codes(l) == expectedFirstFrame+1 % If the first frame droppped
+                               
+                               fprintf('\t2nd frame @ %06.4fs', ts(l));
+                               
+                               frames_start_index = l;
+                               first_frame = 2;
+                               
+                               frames_start_s = ts(l)-expectedFrameTime_s; % F
+                               frames_ts(1) = ts(l)-expectedFrameTime_s;
+                               
+                               break;
+                           end
+                           
+                           l = l+1;
+                       end
+                       
+                       f = first_frame; %Frame number
+                       i = frames_start_index; %Index
+                       
+                       while i <= nevents
+                          
+                           if codes(i) == 1000+f
+                               
+                               frames_ts(f)= ts(i);
+                               
+                               fprintf('\n\t\t\t frame %d @ %06.4fs',f, ts(i));
+                               
+                               f = f+1;
+                               i = i+1;
+                           elseif i+1 <= nevents %If we are able to look one ahead
+                               
+                               a = i+1;
+                               
+                               if codes(a) == 1000+f+1 %If we dropped a frame
+                                  
+                                   frames_ts(f) = ts(a)-expectedFrameTime_s; %The 
+                                   
+                                   fprintf('\n\t\t\t dropped frame %d @ %06.4fs',f, ts(a)-expectedFrameTime_s); 
+                                   
+                                   f = f+1;
+                                   i = i+1;
+                               else
+                                   fprintf('\n\t\t\tEnd\n');
+                                break;
+                               end
+                           else
+                               fprintf('\n\t\t\tEnd\n');
+                               break;
+                                
+                           end
+                           
+                       end
+                       
+                       nframes = f-1;
+                       frames_stop_s = ts(i-1);
+                       
+                       fprintf('\nTrial end @ %06.4fs\t %d frames found', frames_stop_s, nframes);
+   
+                     fprintf('\n');
+                     
+                     
+                     
+                     t = t + 1;
+                     
+                     trial(t).cueOnS = cue_on_s;
+                     trial(t).cueOffS = cue_off_s;
+                     trial(t).movieOnS = frames_start_s;
+                     trial(t).movieOffS = frames_stop_s;
+                     trial(t).movieLengthS = frames_stop_s-frames_start_s;
+                     trial(t).numberFrames = nframes;
+                     trial(t).condition = condition;
+                     trial(t).frameTimes = frames_ts;
+                     
+                     clear cue_on_s cue_off_s frames_start_s frames_stop_s nframes condition frames_ts
+                   end
+               
+               end
+               
+           end
+               
+        end
+        
+    otherwise
+end
     
-else
-    warndlg('Uneven number of encodes found, critical encode must have dropped');
-end
-
-codes = nan(1,c);
+        
 
 
-for i=1:length(lob);
-    codes(i)=double(lob(i))+(double(hib(i))*256);
-end
-
-ts(codes==0)=[];
-codes(codes==0)=[];
 
 
 
