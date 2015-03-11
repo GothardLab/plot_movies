@@ -54,7 +54,7 @@ for c = 1:size(spike,2)
 end
 
 % Make sure we could find the eyes
-if ~exist(xChan, 'var') ||  ~exist(yChan, 'var')
+if ~exist('xChan', 'var') ||  ~exist('yChan', 'var')
      warndlg('Cannot find X and/or Y eye channels in file');
      return
 end 
@@ -68,6 +68,43 @@ yEyes = spike(yChan);
 
 % Calibrate the eye data during the trials
 [ trial_eyes ] = calibrateXY (trial, xEyes, yEyes, presentParams);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,38 +1,66 @@
 function [trial_eyes] = calibrateXY (trial, xEyes, yEyes, presentParams)
+ %keep trial xEyes yEyes presentParams
+ 
+ 
+monitorPixelWidth = presentParams.monitorWidthPixels; %the width of the monitor used during calibration (800x600 typically);
+monitorPixelHeight = presentParams.monitorHeightPixels; %the height of the monitor used during calibration (800x600 typically);
+monitorVoltageScale = presentParams.monitorVoltageScale; %the number of volts (out of 5) to distribute across the monitor (determned in presentation timing file);
 
-monitorPixelWidth = 800; %the width of the monitor used during calibration (800x600 typically);
-monitorPixelHeight = 600; %the height of the monitor used during calibration (800x600 typically);
-monitorVoltageScale = 4.0; %the number of volts (out of 5) to distribute across the monitor (determned in presentation timing file);
 xScaleFactor = (monitorPixelWidth/2)/monitorVoltageScale;
 yScaleFactor = (monitorPixelHeight/2)/monitorVoltageScale;
-monitorCmWidth = 37.8; %width of the monitor in cm
-monitorCmHeight = 30; %height of the monitor in cm
-monkeyMonitorDistance = 57; %distance of monkey's eye from screen
+
+monitorCmWidth = presentParams.monitorCMWidth;%width of the monitor in cm
+monitorCmHeight = presentParams.monitorCMHeight; %height of the monitor in cm
+monkeyMonitorDistance = presentParams.monkeyMonitorDist; %distance of monkey's eye from screen
+
 fixSpotXAngleWidth = 2*(atand((monitorCmWidth/2)/monkeyMonitorDistance)); %WIDTH OF FIXSPOT IN DVA
 fixSpotYAngleWidth = 2*(atand((monitorCmHeight/2)/monkeyMonitorDistance)); %WIDTH OF FIXSPOT IN DVA
+
 xPixelAngleFactor = fixSpotXAngleWidth/monitorPixelWidth; %conversion factor for taking pixels to DVA
 yPixelAngleFactor = fixSpotYAngleWidth/monitorPixelHeight; %conversion factor for taking pixels to DVA
 
 ntrials = size(trial,2);
 
-rawX = spikeFile(xChan).data;
-rawY = spikeFile(yChan).data;
+rawX = xEyes.data;
+rawY = yEyes.data;
+
 calX = rawX * xScaleFactor * xPixelAngleFactor;
 calY = rawY * xScaleFactor * yPixelAngleFactor;
 
-movieTrialCount = size(movie,2);
+trial_eyes = trial;
 
-for movieTrialIndex = 1:movieTrialCount
-    for frameIndex = 1:size(movie(movieTrialIndex).frame,2)
-        frameStartMS = round(movie(movieTrialIndex).frame(frameIndex).start * 1000);
-        frameEndMS = round(movie(movieTrialIndex).frame(frameIndex).end * 1000);
+frameRatePerSecond = 30;
+expectedFrameTime_s = (1/frameRatePerSecond);
+expectedFrameTime_ms = round(expectedFrameTime_s*1000);
+
+for t = 1:ntrials
+ 
+    
+    for f = 1:trial(t).numberFrames-1
         
-        movie(movieTrialIndex).frame(frameIndex).rawX = rawX(frameStartMS:frameEndMS);
-        movie(movieTrialIndex).frame(frameIndex).rawY = rawY(frameStartMS:frameEndMS);
-        movie(movieTrialIndex).frame(frameIndex).calX = calX(frameStartMS:frameEndMS);
-        movie(movieTrialIndex).frame(frameIndex).calY = calY(frameStartMS:frameEndMS);
+ 
+        frameStart_ms = round(trial_eyes(t).frameTimes(f) * 1000);
+        frameEnd_ms = round(trial_eyes(t).frameTimes(f+1) * 1000);
+        
+        trial_eyes(t).frame(f).frameStart_ms = frameStart_ms;
+        trial_eyes(t).frame(f).frameEnd_ms = frameEnd_ms;
+        trial_eyes(t).frame(f).rawX = rawX(frameStart_ms:frameEnd_ms);
+        trial_eyes(t).frame(f).rawY = rawY(frameStart_ms:frameEnd_ms);
+        trial_eyes(t).frame(f).calX = calX(frameStart_ms:frameEnd_ms);
+        trial_eyes(t).frame(f).calY = calY(frameStart_ms:frameEnd_ms);
 
     end
+    
+    f = trial(t).numberFrames; % For the last frame
+    frameStart_ms = round(trial_eyes(t).frameTimes(f) * 1000);
+    frameEnd_ms = frameStart_ms + expectedFrameTime_ms;
+
+    trial_eyes(t).frame(f).frameStart_ms = frameStart_ms;
+    trial_eyes(t).frame(f).frameEnd_ms = frameEnd_ms;
+    trial_eyes(t).frame(f).rawX = rawX(frameStart_ms:frameEnd_ms);
+    trial_eyes(t).frame(f).rawY = rawY(frameStart_ms:frameEnd_ms);
+    trial_eyes(t).frame(f).calX = calX(frameStart_ms:frameEnd_ms);
+    trial_eyes(t).frame(f).calY = calY(frameStart_ms:frameEnd_ms);
  
 end
 
