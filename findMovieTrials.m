@@ -34,6 +34,8 @@ expectedFrameTime_s = 1/frameRatePerSecond;
 
 method = 'cue';
 
+conditionInstances = nan(999,1);
+
 switch method
     
     case 'cumsumdiff' % Not functional yet
@@ -184,7 +186,20 @@ switch method
                      trial(t).condition = condition;
                      trial(t).frameTimes = frames_ts;
                      
+                     
                      fprintf('\n\tRecording as trial number: %d',  t);
+                     
+                     if isnan(conditionInstances(condition))
+                         conditionInstances(condition) = 1;
+                     else
+                         conditionInstances(condition) = conditionInstances(condition)+1;
+                     end
+                     
+                      trial(t).instance = conditionInstances(condition);
+                     
+                     
+                     
+                     fprintf('\n\tInstance number: %d',   trial(t).instance);
                      
                      clear cue_on_s cue_off_s frames_start_s frames_stop_s nframes condition frames_ts
                      fprintf('\n');
@@ -198,6 +213,8 @@ switch method
         
     otherwise
 end
+
+
     
         
 
