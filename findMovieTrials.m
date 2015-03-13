@@ -84,7 +84,8 @@ switch method
                            condition = codes(c+2)-(256*255);
                        end
                        
-                       fprintf('Potential trial @ %06.4fs\t-->\tCondition:%d', cue_on_s, condition);
+                       fprintf('Potential trial at: %06.4fs', cue_on_s);
+                        fprintf('\n\tCondition: %d', condition);
                        
 
                        expectedFirstFrame = 1001;
@@ -98,7 +99,7 @@ switch method
                            
                            if codes(l) == expectedFirstFrame % If we find our expected start frame
                                
-                                fprintf('\tFrames @ %06.4fs', ts(l));
+                                fprintf('\n\tFirst frame found at: %06.4fs', ts(l));
                                 
                                 frames_start_index = l;
                                 first_frame = 1;
@@ -110,7 +111,7 @@ switch method
                                 
                            elseif codes(l) == expectedFirstFrame+1 % If the first frame droppped
                                
-                               fprintf('\t2nd frame @ %06.4fs', ts(l));
+                               fprintf('\n\tFound 2nd frame at: %06.4fs', ts(l));
                                
                                frames_start_index = l;
                                first_frame = 2;
@@ -133,7 +134,7 @@ switch method
                                
                                frames_ts(f)= ts(i);
                                
-                               fprintf('\n\t\t\t frame %d @ %06.4fs',f, ts(i));
+                              % fprintf('\n\t\t\t frame %d @ %06.4fs',f, ts(i));
                                
                                f = f+1;
                                i = i+1;
@@ -145,16 +146,16 @@ switch method
                                   
                                    frames_ts(f) = ts(a)-expectedFrameTime_s; %The 
                                    
-                                   fprintf('\n\t\t\t dropped frame %d @ %06.4fs',f, ts(a)-expectedFrameTime_s); 
+                                   fprintf('\n\tDropped frame %d @ %06.4fs',f, ts(a)-expectedFrameTime_s); 
                                    
                                    f = f+1;
                                    i = i+1;
                                else
-                                   fprintf('\n\t\t\tEnd');
+                                   %fprintf('\n\t\t\tEnd');
                                 break;
                                end
                            else
-                               fprintf('\n\t\t\tEnd');
+                               %fprintf('\n\t\t\tEnd');
                                break;
                                 
                            end
@@ -164,9 +165,11 @@ switch method
                        nframes = f-1;
                        frames_stop_s = ts(i-1);
                        
-                       fprintf('\nTrial end @ %06.4fs\t %d frames found\n\n', frames_stop_s, nframes);
-   
-                     fprintf('\n');
+                        
+                       fprintf('\n\tTrial end at: %06.4fs', frames_stop_s);
+                       fprintf('\n\tTrial length: %06.4fs', frames_stop_s-frames_start_s);
+                       fprintf('\n\tFrames found: %d',  nframes);   
+                       
                      
                      
                      
@@ -181,7 +184,10 @@ switch method
                      trial(t).condition = condition;
                      trial(t).frameTimes = frames_ts;
                      
+                     fprintf('\n\tRecording as trial number: %d',  t);
+                     
                      clear cue_on_s cue_off_s frames_start_s frames_stop_s nframes condition frames_ts
+                     fprintf('\n');
                    end
                
                end

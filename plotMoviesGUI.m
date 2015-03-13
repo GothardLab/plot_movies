@@ -925,7 +925,7 @@ if validInputs(datastruct)
     plotDat.timeParams = datastruct.timeParams;
     plotDat.smrParams = datastruct.smrParams;
     plotDat.itemParams = datastruct.itemParams;
-    plotDat.spike = datastruct.outParams;
+    plotDat.outParams = datastruct.outParams;
     plotDat.sourceParams = datastruct.sourceParams;
     
     save('plotDat.mat', 'plotDat');
