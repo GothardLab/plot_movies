@@ -87,6 +87,8 @@ PRES2ANG = presentParams.pres2ang;
 %Set the plotting color
 fixColor = plotDat.plotParams.plotColor;
 
+%Find the output path
+
 % Number of trials found
 ntrials = size(trial,2);
 
@@ -144,7 +146,7 @@ for t = 1:ntrials
         
     end
     
-    set(gca,'xdir','reverse')
+   % set(gca,'xdir','reverse')
     %Loop through the frames that were shown
     for f = 1:nFrames
         
@@ -157,10 +159,10 @@ for t = 1:ntrials
         calY= thisTrial.frame(f).calY;
         
         %Clear the image
-        cla;
+        %cla;
         
         %Put plot hold on
-        hold on;
+        %hold on;
         
         %Display the background
         imagesc([-(size(blackround,2)/2)*xPixelAngleFactor,(size(blackround,2)/2)*xPixelAngleFactor],[-(size(blackround,1)/2)*yPixelAngleFactor,(size(blackround,1)/2)*yPixelAngleFactor],blackround);
@@ -177,7 +179,7 @@ for t = 1:ntrials
         hold on;
         
         %Plot the scanpath
-        plot(thisTrial(t).frame(f).calX,-thisTrial(t).frame(f).calY,'Color',fixColor,'LineWidth',5);
+        plot(calX,-calY,'Color',fixColor,'LineWidth',5);
         
         %Get the frame to save
         frame = getframe;
