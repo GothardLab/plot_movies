@@ -920,6 +920,8 @@ function plotButton_Callback(hObject, eventdata, handles)
 datastruct = guidata(gcbo);
 
 if validInputs(datastruct)
+    
+    %Copy the relevent items from datastruct into plotDat
     plotDat.plotParams = datastruct.plotParams;
     plotDat.presentParams = datastruct.presentParams;
     plotDat.timeParams = datastruct.timeParams;
@@ -928,7 +930,8 @@ if validInputs(datastruct)
     plotDat.outParams = datastruct.outParams;
     plotDat.sourceParams = datastruct.sourceParams;
     
-    save('plotDat.mat', 'plotDat');
+    %Plot the movies
+    plotMoviesFunc( plotDat );
 else
     
 end

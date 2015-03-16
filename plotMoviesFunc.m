@@ -1,7 +1,7 @@
 %       plotMoviesFunc.m
 %           Written by Philip Putnam, University of Arizona, 2015
 
-%function [ output_args ] = plotMoviesFunc( plotDat )
+function plotMoviesFunc( plotDat )
 %PLOTMOVIESFUNC Plots movie scanpath input from GUI or wrapper function
 %   Inputs
 %       'spike', (string): Path to spike file
@@ -12,9 +12,9 @@
 %Need to write vargin for plotDat or commands
 
 %%%%%%Debug%%%%%%%%
-clear all
-clc
-load('plotDat.mat');
+% clear all
+% clc
+% load('plotDat.mat');
 %%%%%%%%%%%%%%%%%%%
 
 % Set values from plotDat
@@ -207,6 +207,16 @@ for t = 1:ntrials
         
         %Plot the scanpath
         plot(calX,-calY,'Color',fixColor,'LineWidth',5);
+        
+        
+        if ~plotDat.plotParams.cypherNames
+            %Create a movie info string to display
+            movieInfoStr = ['\bf',num2str(t), '   ',stimName, ': frame ', num2str(f),', ', num2str(round(thisTrial.movieOnS)),' s'];
+            
+            %Display the string
+            text(-17,-15, movieInfoStr, 'Color','w','FontSize',14);
+        
+        end
         
         %Get the frame to save
         frame = getframe;
