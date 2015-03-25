@@ -200,7 +200,7 @@ function itemFindPushButton_Callback(hObject, eventdata, handles)
 
 datastruct = guidata(gcbo);
 
-[FileName,PathName,FilterIndex] = uigetfile('*.text','Find the text file with the items...');
+[FileName,PathName,FilterIndex] = uigetfile('*.txt','Find the text file with the items...');
 
 itemFullPath = fullfile(PathName, FileName);
 
