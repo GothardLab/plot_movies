@@ -133,8 +133,8 @@ for t = 1:ntrials
     
     %Find where to save the file
     if plotDat.plotParams.cypherNames
-    [ cipherMovieTitle ] = cipherName( movieTitle );
-        movieWritePath = fullfile(saveDir, [cipherDataName, '.avi']);
+        [ cipherMovieTitle ] = cipherName( movieTitle );
+        movieWritePath = fullfile(saveDir, [cipherMovieTitle, '.avi']);
     else  
         movieWritePath = fullfile(saveDir, [movieTitle, '.avi']);
     end
