@@ -24,6 +24,7 @@ spikePath = plotDat.smrParams.path;
 itemPath = plotDat.itemParams.path;
 presentParams = plotDat.presentParams;
 outParams = plotDat.outParams;
+plotParams = plotDat.plotParams;
 
 % Load spike file
 try
@@ -60,7 +61,15 @@ if ~exist('xChan', 'var') ||  ~exist('yChan', 'var')
 end
 
 % Find the movie trials
-[ trial ] = findMovieTrials(spikePath);
+if isfield(plotParams, 'trialType')
+    
+    [ trial ] = findMovieTrials(spikePath, 'method', plotDat.plotParams.trialType);
+    
+else %Use default method
+    
+    [ trial ] = findMovieTrials(spikePath);
+
+end
 
 % Seperate the eye channels
 xEyes = spike(xChan);

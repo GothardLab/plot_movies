@@ -31,7 +31,7 @@ function varargout = plotMoviesGUI(varargin)
 
 % Edit the above text to modify the response to help plotMoviesGUI
 
-% Last Modified by GUIDE v2.5 09-Mar-2015 19:25:29
+% Last Modified by GUIDE v2.5 23-Jun-2015 11:10:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -986,3 +986,53 @@ end
 
 
 
+
+
+% --- Executes on selection change in methodPopup.
+function methodPopup_Callback(hObject, eventdata, handles)
+% hObject    handle to methodPopup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+datastruct = guidata(gcbo);
+
+contents = cellstr(get(hObject,'String'));
+
+if isfield(datastruct, 'plotParams')
+    plotParams = datastruct.plotParams;
+    plotParams.trialType =  contents{get(hObject,'Value')};
+else
+    plotParams.trialType =  contents{get(hObject,'Value')};
+end
+
+datastruct.plotParams = plotParams;
+guidata(gcbo,datastruct) 
+% Hints: contents = cellstr(get(hObject,'String')) returns methodPopup contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from methodPopup
+
+
+% --- Executes during object creation, after setting all properties.
+function methodPopup_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to methodPopup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+% hObject    handle to colorMenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+datastruct = guidata(gcbo);
+
+contents = cellstr(get(hObject,'String'));
+
+if isfield(datastruct, 'plotParams')
+    plotParams = datastruct.plotParams;
+    plotParams.trialType =  contents{get(hObject,'Value')};
+else
+    plotParams.trialType =  contents{get(hObject,'Value')};
+end
+
+datastruct.plotParams = plotParams;
+guidata(gcbo,datastruct) 
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

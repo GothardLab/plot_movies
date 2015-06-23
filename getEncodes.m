@@ -53,19 +53,20 @@ if ~mod(size(events,1),2) %If there are an even amount of events for pairing
         end
     end
     
+    codes = nan(1,c);
+
+
+    for i=1:length(lob);
+        codes(i)=double(lob(i))+(double(hib(i))*256);
+    end
+
+    ts(codes==0)=[];
+    codes(codes==0)=[];
+
+    
 else
-    warndlg('Uneven number of encodes found, critical encode must have dropped...');
-end
-
-codes = nan(1,c);
-
-
-for i=1:length(lob);
-    codes(i)=double(lob(i))+(double(hib(i))*256);
-end
-
-ts(codes==0)=[];
-codes(codes==0)=[];
-
+    %warndlg('Uneven number of encodes found, critical encode must have dropped... using exceptions!');
+    
+    [ts, codes ] = encodeExceptions(events, times);
 end
 
