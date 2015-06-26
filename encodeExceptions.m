@@ -2,9 +2,14 @@ function [ts, codes ] = encodeExceptions(events, times)
 %ENCODEEXCEPTIONS Summary of this function goes here
 %   Detailed explanation goes here
 
+tooClose = 0.002; %Closest two paired encodes can be, usually 0.002 seconds
+tooFar =0.006; %Farthest two paired encodes can be, usually 0.006 seconds
 
+timeDiffs = diff(times);
 
-    for i = 1:(size(events,1)-1)
+c = 0;
+
+for i = 1:(size(events,1)-1)
         if (timeDiffs(i)>tooClose && timeDiffs(i)<tooFar)
             c=c+1;
             lob(c)=events(i);
