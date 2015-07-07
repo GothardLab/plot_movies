@@ -12,11 +12,14 @@
 function [ trial ] = findMovieTrials(dataPath, varargin)
 %clear all
 %clc
-% varargin = {'method', 'Pattern Matching'};
-% dataPath = 'C:\Users\Bread\Desktop\WowPandasAreCool\Ridge_ShowMoviesFrames_061805.smr';
+% clear all
+% clc
+% varargin = {'method', 'Cumulative Sum Differential'};
+% dataPath = 'D:\dev\temp\7_6_15_Rum_Inhalation.smr';
 
 %FINDMOVIETRIALS Finds movie trials from show_movies.sce or similar
 %   Inputs:
+
 %       'dataPath', (string): Path to spike file
 %       'itemPath', (string): Path to item file
 %
@@ -36,6 +39,8 @@ nevents = size(codes,2);
 
 frameRatePerSecond = 30;
 expectedFrameTime_s = 1/frameRatePerSecond;
+
+
 
 
 
@@ -59,6 +64,12 @@ switch method
     
     case 'Cumulative Sum Differential' % Not functional yet
         
+        minSequentialLength = 2;
+        expectedPatterns = {1001:1299, 1001:1090};
+        lookAhead = 6;
+        
+        pt = 0;
+        
         fprintf('Using cumulative sum differential method!\n');
         
         diffCodes = [0 cumsum(diff(codes)~=1)];
@@ -67,16 +78,209 @@ switch method
         
         numUniqueDiffCodes = size(uniqueDiffCodes,2);
         
+        usedInTrialBooleanIndex = zeros(1, numUniqueDiffCodes);
+        
         for u = 1:numUniqueDiffCodes
             
             theseLocs = find(diffCodes == uniqueDiffCodes(u));
+            
+            theseCodes = codes(theseLocs);
             
             thisSeqFirst = codes(theseLocs(1));
             thisSeqLast = codes(theseLocs(end));
             thisDiffCode = diffCodes(theseLocs(1));
             numTheseLocs = size(theseLocs,2);
-            fprintf('Codes: %6d -> %6d\t\tElements: %6d -> %6d\tDiff: %d\tInstances: %d\t\n',thisSeqFirst, thisSeqLast,theseLocs(1), theseLocs(end), thisDiffCode, numTheseLocs);
+            fprintf('Codes: %6d -> %6d\t\tElements: %6d -> %6d\tDiff: %04d\tInstances: %d\t\n',thisSeqFirst, thisSeqLast,theseLocs(1), theseLocs(end), thisDiffCode, numTheseLocs);
+            
+            if ~usedInTrialBooleanIndex(u)
+                
+                containsValidElements = 0;
+                
+                if numTheseLocs >= minSequentialLength
+                    fprintf('\tGreater than threshold!\n');
+                    
+                    for p = 1:size(expectedPatterns,2)
+                        if length(intersect( expectedPatterns{p}, theseCodes)) > 0
+                            containsValidElements = 1;
+                        end
+                    end
+                    
+                    if containsValidElements
+                        
+                        
+                        pt = pt+1;
+                        
+                        fprintf('\tContains valid elements, proceeding as potential trial %4d\n', pt);
+                        
+                        potentials(pt).idx = theseLocs;
+                        potentials(pt).vals = theseCodes;
+                        
+                        
+                        
+                        for a = 1:lookAhead;
+                            
+                            if u+a <= numUniqueDiffCodes
+                                aheadLocs = find(diffCodes == uniqueDiffCodes(u+a));
+                                aheadCodes = codes(aheadLocs);
+                                aheadSeqFirst = codes(aheadLocs(1));
+                                aheadSeqLast = codes(aheadLocs(end));
+                                aheadDiffCode = diffCodes(aheadLocs(1));
+                                numAheadLocs = size(aheadLocs,2);
+                                
+                                if numAheadLocs > minSequentialLength
+                                    fprintf('\tFound another block - Codes: %6d -> %6d\t\tElements: %6d -> %6d\tDiff: %04d\tInstances: %d\t\n',aheadSeqFirst, aheadSeqLast,aheadLocs(1), aheadLocs(end), aheadDiffCode, numAheadLocs);
+                                    usedInTrialBooleanIndex(u+a) = 1;
+                                    
+                                    potentials(pt).idx = horzcat(potentials(pt).idx, aheadLocs);
+                                    potentials(pt).vals = horzcat(potentials(pt).vals, aheadCodes);
+                                end
+                            end
+                            
+                        end
+                        fprintf('\tRecorded as potential trial %4d with %4d frames found\n', pt, size(potentials(pt).vals,2));
+                    end
+                end
+                
+            else
+                fprintf('\tAlready used in another trial!\n');
+            end
+            
+            
         end
+        
+        
+        % Trial validation loops
+        
+        rt = 0;
+        
+        
+        for pt = 1:size(potentials,2)
+            fprintf('\nPotential trial: %03d Frames Found: %03d\n', pt, size(potentials(pt).vals,2));
+            
+            
+            for p = 1:size(expectedPatterns,2)
+                patternMatches(p) = length(intersect( expectedPatterns{p}, potentials(pt).vals));
+                patternMismatches(p) = length( expectedPatterns{p}) - length(intersect( expectedPatterns{p}, potentials(pt).vals));
+            end
+            
+            [mostMatches, mostMatchesIdx] = max(patternMatches);
+            [mostMismatches, mostMismatchesIdx] = max(patternMismatches);
+            [leastMatches, leastMatchesIdx] = min(patternMatches);
+            [leastMismatches, leastMismatchesIdx] = min(patternMismatches);
+            
+            if mostMismatches > mostMatches && mostMatchesIdx == mostMismatchesIdx
+                bestIdx =  leastMismatchesIdx;
+            else
+                bestIdx =  mostMatchesIdx;
+                
+            end
+            
+            
+            numberMatches = patternMatches(bestIdx);
+            
+            bestPattern = expectedPatterns{bestIdx};
+            
+            fprintf('\tBest match is pattern %d (%d - %d) = %d matches, %d drop(s)\n', bestIdx, bestPattern(1), bestPattern(end), numberMatches, length(bestPattern)-numberMatches);
+            
+            
+            trialFrames = bestPattern;
+            trialIdxs = zeros(1, length(trialFrames));
+            
+            fprintf('\t');
+            for f = 1:length(trialFrames)
+                
+                expectedVal = trialFrames(f);
+                
+                if ~isempty(intersect(expectedVal, potentials(pt).vals))
+                    fprintf('.');
+                    foundValIdx = find(potentials(pt).vals == expectedVal);
+                    
+                    trialIdxs(f) = potentials(pt).idx(foundValIdx);
+                    
+                elseif f ~= 0
+                    fprintf('X');
+                    
+                    trialIdxs(f) = trialIdxs(f-1)+1;
+                else
+                    
+                end
+                
+                
+                
+                
+            end
+            
+            fprintf('\n');
+            
+            if mean(diff(trialIdxs))
+                rt = rt +1;
+                
+                lookback = 5;
+                 validConditions = [1:100];
+                 
+                frames_ts = ts(trialIdxs);
+                
+                fprintf('\tValid Trial %d\n', rt);
+                
+                frames_start_s = frames_ts(1);
+                frames_stop_s = frames_ts(end);
+                
+                fprintf('\tFrames %fs --> %fs (%fs)\n', frames_start_s, frames_stop_s, frames_stop_s-frames_start_s);
+                
+                nframes = length(frames_ts);
+                
+                fprintf('\t%d frames\n', nframes);
+                
+                
+                trial(rt).cueOnS = 0;
+                trial(rt).cueOffS = 0;
+                trial(rt).movieOnS = frames_start_s;
+                trial(rt).movieOffS = frames_stop_s;
+                trial(rt).movieLengthS = frames_stop_s-frames_start_s;
+                trial(rt).numberFrames = nframes;
+                %
+                trial(rt).frameTimes = frames_ts;
+                
+             for lb = (trialIdxs(1)-lookback):trialIdxs
+                
+                
+                if codes(lb) == 35
+                    cue_on_s = ts(lb);
+                    fprintf('\tCue on: %06.4fs\n', cue_on_s);
+                elseif codes(lb) == 36
+                    cue_off_s = ts(lb);
+                    fprintf('\tCue off: %06.4fs\n', cue_off_s);
+                elseif any(ismember(validConditions,(codes(lb)-(256*255))) == 1)
+                    condition = (codes(lb)-(256*255));
+                    fprintf('\tCondition: %d\n', condition);
+                end
+                
+             end
+            
+             trial(rt).condition = condition;
+                
+             
+            if isnan(conditionInstances(condition))
+                conditionInstances(condition) = 1;
+            else
+                conditionInstances(condition) = conditionInstances(condition)+1;
+            end
+            
+            trial(rt).instance = conditionInstances(condition);
+            fprintf('\tInstance number: %d\n',   trial(rt).instance);
+                 
+              
+                
+                  fprintf('\n');
+            else
+                fprintf('\tSkipping over potential trial %d\n', pt);
+            end
+            
+            
+            
+            
+        end
+        
         
         
         %codes(diffCodes==mode(diffCodes))
@@ -429,16 +633,16 @@ switch method
             
             if min(predictedPatternIdxs) > 0 && max(predictedPatternIdxs) <= length(codes)
                 patternIdxMatches  = intersect(potentialIdxs, predictedPatternIdxs);
-            
+                
                 patternMismatches = size(patternIdxMatches,1);
                 
                 validTsBool = 1;
-            
+                
                 if length(expectedPattern)-patternMismatches <= allowedTotalErrors
                     
                     potentialTs = ts(predictedPatternIdxs);
                     
-                    if any(diff(potentialTs)) > tooFar 
+                    if any(diff(potentialTs)) > tooFar
                         
                         outOfRangeIdx = find( diff(potentialTs) > tooFar  );
                         
@@ -450,12 +654,12 @@ switch method
                         else
                             % validTsBool = 0;
                         end
-                            
+                        
                     end
                     
-%                     if any(diff(potentialTs)) < tooClose
-%                          validTsBool = 0;
-%                     end
+                    %                     if any(diff(potentialTs)) < tooClose
+                    %                          validTsBool = 0;
+                    %                     end
                     
                     
                     %Check for time point contunity here
@@ -465,14 +669,14 @@ switch method
                     if validTsBool %&& predictedCodes(1) == expectedPattern(1) && predictedCodes(end) == expectedPattern(end)
                         
                         m = m + 1;
-                    
                         
-                    movieIdxs(m, 1:length(predictedPatternIdxs)) = predictedPatternIdxs;
-                    movieCodes(m, 1:length(predictedPatternIdxs)) = predictedCodes;
-                    movieTs(m, 1:length(predictedPatternIdxs)) = potentialTs;
-                    
-                    fprintf('Valid pattern match:%d from indices %d --> %d, between %6f --> %6f (total: %5f)\n', m, codes(predictedPatternIdxs(1)), codes(predictedPatternIdxs(end)), potentialTs(1), potentialTs(end), potentialTs(end)-potentialTs(1));
-                    
+                        
+                        movieIdxs(m, 1:length(predictedPatternIdxs)) = predictedPatternIdxs;
+                        movieCodes(m, 1:length(predictedPatternIdxs)) = predictedCodes;
+                        movieTs(m, 1:length(predictedPatternIdxs)) = potentialTs;
+                        
+                        fprintf('Valid pattern match:%d from indices %d --> %d, between %6f --> %6f (total: %5f)\n', m, codes(predictedPatternIdxs(1)), codes(predictedPatternIdxs(end)), potentialTs(1), potentialTs(end), potentialTs(end)-potentialTs(1));
+                        
                     else
                         
                     end
@@ -483,11 +687,11 @@ switch method
                 
             end
             
-           
+            
             %Loop through collected Movies to organize them and find
             %conditions
             
-           
+            
             
             
             
@@ -502,81 +706,97 @@ switch method
         end
         
         
-         validConditions = [1:100];
-         t = 0;
-            for m = 1:size(movieTs,1)
-                 fprintf('\n\nMovie: %d', m);
-                        lookback = 8;
-                        movieCodesFound = movieCodes(m, :);
-                        movieCodesIdxs = movieIdxs(m, :);
-                         frames_ts = movieTs(m, :); 
-                        
-                        startFrameIdx = movieCodesIdxs(1);
-                        
-                        if startFrameIdx-lookback <= 0    
-                         lookback = startFrameIdx-1;
-                        end
-                        
-                        
-                       % previousCodes = codes(startFrameIdx-lookback:startFrameIdx);
-                        
-                        for c = (startFrameIdx-lookback):startFrameIdx
-                            
-         
-                            if codes(c) == 35
-                                cue_on_s = ts(c);
-                                fprintf('\n\tCue on: %06.4fs', cue_on_s);
-                            elseif codes(c) == 36
-                                cue_off_s = ts(c);
-                                fprintf('\n\tCue off: %06.4fs', cue_on_s);
-                            elseif any(ismember(validConditions,(codes(c)-(256*255))) == 1)
-                                condition = (codes(c)-(256*255));
-                                 fprintf('\n\tCondition: %d', condition);
-                            end
-                            
-                        end
-                        
-                          
-                       
-                        
-                        
-                        
-                        
-                        
-                    
-                        frames_start_s = movieTs(m, 1);
-                        frames_stop_s  = movieTs(m, end);
-                         nframes = size(movieTs,2);
+        validConditions = [1:100];
+        t = 0;
+        for m = 1:size(movieTs,1)
+            fprintf('\n\nMovie: %d', m);
+            lookback = 8;
+            movieCodesFound = movieCodes(m, :);
+            movieCodesIdxs = movieIdxs(m, :);
+            frames_ts = movieTs(m, :);
+            
+            startFrameIdx = movieCodesIdxs(1);
+            
+            if startFrameIdx-lookback <= 0
+                lookback = startFrameIdx-1;
+            end
+            
+            
+            % previousCodes = codes(startFrameIdx-lookback:startFrameIdx);
+            
+            cue_on_s = NaN;
+            cue_off_s = NaN;
+            condition = NaN;
+            
+            for c = (startFrameIdx-lookback):startFrameIdx
                 
                 
-                
-                        t = t + 1;
-                        
-                        trial(t).cueOnS = cue_on_s;
-                        trial(t).cueOffS = cue_off_s;
-                        trial(t).movieOnS = frames_start_s;
-                        trial(t).movieOffS = frames_stop_s;
-                        trial(t).movieLengthS = frames_stop_s-frames_start_s;
-                        trial(t).numberFrames = nframes;
-                        trial(t).condition = condition;
-                        trial(t).frameTimes = frames_ts;
-                        
-                          fprintf('\n\tTrial end at: %06.4fs', frames_stop_s);
-                        fprintf('\n\tTrial length: %06.4fs', frames_stop_s-frames_start_s);
-                        fprintf('\n\tFrames found: %d',  nframes);
-                        
-                        fprintf('\n\tRecording as trial number: %d',  t);
-                        
-                        if isnan(conditionInstances(condition))
-                            conditionInstances(condition) = 1;
-                        else
-                            conditionInstances(condition) = conditionInstances(condition)+1;
-                        end
-                        
-                        trial(t).instance = conditionInstances(condition);
-                        fprintf('\n\tInstance number: %d',   trial(t).instance);
+                if codes(c) == 35
+                    cue_on_s = ts(c);
+                    fprintf('\n\tCue on: %06.4fs', cue_on_s);
+                elseif codes(c) == 36
+                    cue_off_s = ts(c);
+                    fprintf('\n\tCue off: %06.4fs', cue_on_s);
+                elseif any(ismember(validConditions,(codes(c)-(256*255))) == 1)
+                    condition = (codes(c)-(256*255));
+                    fprintf('\n\tCondition: %d', condition);
+                end
                 
             end
+            
+            if isnan(cue_on_s)
+                cue_on_s = cue_off_s-1;
+            end
+            
+            if isnan(cue_off_s)
+                cue_off_s = cue_on_s+1;
+            end
+            
+            if isnan(condition)
+                condition = 1;
+            end
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            frames_start_s = movieTs(m, 1);
+            frames_stop_s  = movieTs(m, end);
+            nframes = size(movieTs,2);
+            
+            
+            
+            t = t + 1;
+            
+            trial(t).cueOnS = cue_on_s;
+            trial(t).cueOffS = cue_off_s;
+            trial(t).movieOnS = frames_start_s;
+            trial(t).movieOffS = frames_stop_s;
+            trial(t).movieLengthS = frames_stop_s-frames_start_s;
+            trial(t).numberFrames = nframes;
+            trial(t).condition = condition;
+            trial(t).frameTimes = frames_ts;
+            
+            fprintf('\n\tTrial end at: %06.4fs', frames_stop_s);
+            fprintf('\n\tTrial length: %06.4fs', frames_stop_s-frames_start_s);
+            fprintf('\n\tFrames found: %d',  nframes);
+            
+            fprintf('\n\tRecording as trial number: %d',  t);
+            
+            if isnan(conditionInstances(condition))
+                conditionInstances(condition) = 1;
+            else
+                conditionInstances(condition) = conditionInstances(condition)+1;
+            end
+            
+            trial(t).instance = conditionInstances(condition);
+            fprintf('\n\tInstance number: %d',   trial(t).instance);
+            
+        end
         
     otherwise
         fprintf('Using no method!\n');
