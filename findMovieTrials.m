@@ -15,7 +15,7 @@ function [ trial ] = findMovieTrials(dataPath, varargin)
 % clear all
 % clc
 % varargin = {'method', 'Cumulative Sum Differential'};
-% dataPath = 'D:\dev\temp\7_6_15_Rum_Inhalation.smr';
+% dataPath = 'D:\dev\temp\ThomasMoviesFramesVarLengthFourTimes.smr';
 
 %FINDMOVIETRIALS Finds movie trials from show_movies.sce or similar
 %   Inputs:
@@ -152,9 +152,11 @@ switch method
         % Trial validation loops
         
         rt = 0;
-        
+        minFramesForATrial = 60;
         
         for pt = 1:size(potentials,2)
+            
+            if size(potentials(pt).vals,2) >= minFramesForATrial 
             fprintf('\nPotential trial: %03d Frames Found: %03d\n', pt, size(potentials(pt).vals,2));
             
             
@@ -197,7 +199,7 @@ switch method
                     
                     trialIdxs(f) = potentials(pt).idx(foundValIdx);
                     
-                elseif f ~= 0
+                elseif f ~= 1
                     fprintf('X');
                     
                     trialIdxs(f) = trialIdxs(f-1)+1;
@@ -278,7 +280,7 @@ switch method
             
             
             
-            
+            end
         end
         
         
