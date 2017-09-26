@@ -9,7 +9,7 @@
 %
 %       Code adopted from Clayton Mosher and others in the Gothard lab.
 
-function [ trial ] = findMovieTrials(dataPath, varargin)
+function [ trial ] = findMovieTrials(ts, varargin)
 %clear all
 %clc
 % clear all
@@ -25,10 +25,6 @@ function [ trial ] = findMovieTrials(dataPath, varargin)
 %
 %   Outputs:
 %
-
-% Load spike file
-%try
-[ codes, ts ] = getEncodes( dataPath );
 
 % catch err
 %     warndlg(['Error loading encodes ->', err.identifier],'Spike error')
